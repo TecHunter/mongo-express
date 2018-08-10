@@ -19,11 +19,13 @@ if (process.env.VCAP_SERVICES) {
 var meConfigMongodbServer = process.env.ME_CONFIG_MONGODB_SERVER ? process.env.ME_CONFIG_MONGODB_SERVER.split(',') : false;
 const ca = process.env.ME_CONFIG_MONGODB_SSLCA ?[fs.readFileSync(process.env.ME_CONFIG_MONGODB_SSLCA)]:[];
 const clicert = process.env.ME_CONFIG_MONGODB_SSL && process.env.ME_CONFIG_MONGODB_SSLCLIENT ? fs.readFileSync(process.env.ME_CONFIG_MONGODB_SSLCLIENT): false;
-
+let clicert_pass = undefined;
 //http://mongodb.github.io/node-mongodb-native/3.1/tutorials/connect/
 if(process.env.ME_CONFIG_MONGODB_SSL && !clicert){
   console.error("SSL client enabled but missing client certificate");
   process.exit(-1);
+} else if(process.env.ME_CONFIG_MONGODB_SSLCLIENT_PASS){
+  clicert_pass = process.env.ME_CONFIG_MONGODB_SSLCLIENT_PASS;
 }
 
 module.exports = {
@@ -45,6 +47,7 @@ module.exports = {
     //sslCA: array of valid CA certificates
     sslCA:  ca,
     sslCert: clicert,
+    sslPass: clicert_pass,
 
     //autoReconnect: automatically reconnect if connection is lost
     autoReconnect: true,
